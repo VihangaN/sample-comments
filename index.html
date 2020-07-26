@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comments sample</title>
+
+    <style>
+        * {
+            font-family: sans-serif;
+            transition: 1s;
+        }
+
+        #base {
+            height: auto;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        #clap {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            padding: 20px;
+        }
+
+        #clap:hover {
+            cursor: pointer;
+            background-color: rgb(235, 235, 235);
+        }
+
+        #clap_count {
+            background-color: rgb(235, 81, 54);
+            color: #fff;
+            padding: 5px;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        hr {
+            width: 30%;
+            height: 0.1px;
+        }
+
+        #comment {
+            height: 40px !important;
+            border-radius: 40px;
+            width: 400px;
+            border: none;
+            outline: none;
+            text-align: center;
+            background-color: rgb(241, 240, 240);
+        }
+
+        #Comments {
+            width: 50%;
+            padding: 10px;
+            font-size: 20px;
+        }
+
+        #time{
+            font-size: 10px;
+            color:rgb(148, 148, 148);
+            font-style: italic;
+        }
+
+        #sticker_Container{
+            display: flex;
+            justify-content: space-around;
+            flex-direction: row;
+            width:30%
+        }
+
+        .stkr{
+            width:80px;
+        }
+
+        .stkr:hover{
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        
+
+       
+    </style>
+</head>
+
+<body>
+    <div id="base">
+        <br><br>
+
+        <span id="clap_count">0</span>
+        <br>
+        Claps
+        <br><br>
+        <img src="./media/clap_normal.svg" id="clap">
+
+        <br><br>
+<hr>
+        <br>
+        
+            Standard comment
+            <br> <br><br>
+            <span id="Comments"></span>
+            <br>
+
+            <input type="text" name="comment" id="comment" placeholder="Insert your comment and press enter !">
+        <br> <br>
+
+        <hr>
+<br>
+        sticker comment
+        <br>
+        <br>
+        <br>
+        <div id="sticker">
+
+        </div>
+        <br>
+        <br><br><br><br><br>
+        <div id="sticker_Container">
+            <img src="./media/stkr-2.png" alt="" id="stkr-2" class="stkr" onclick="post('stkr-2')">
+            <img src="./media/stkr-1.png" alt="" id="stkr-1" class="stkr" onclick="post('stkr-1')">
+            <img src="./media/stkr-3.png" alt="" id="stkr-3" class="stkr" onclick="post('stkr-3')">
+            <img src="./media/stkr-4.png" alt="" id="stkr-4" class="stkr" onclick="post('stkr-4')">
+        </div>
+        <br> <br> <br> <br>
+    </div>
+
+
+
+    <script>
+
+        // ==== clap ====
+
+        const clap = document.getElementById("clap");
+        let clap_count = localStorage.getItem("claps");
+
+        let claps_value = document.getElementById("clap_count");
+        claps_value.innerText = clap_count;
+
+
+
+        if (clap_count === null) {
+            localStorage.setItem("claps", 0);
+        }
+
+        if (claps_value.innerText > 0) {
+            clap.src = "./media/clap-fill.svg"
+
+        }
+
+
+        clap.addEventListener("click", () => {
+
+            if (claps_value.innerText > 0) {
+                clap.src = "./media/clap-fill.svg"
+
+            }
+
+            clap_count++;
+            localStorage.setItem("claps", clap_count);
+            claps_value.innerText = clap_count;
+        })
+
+
+        // ==== Standard comment ====
+
+        const comment = document.getElementById("comment");
+        const Comments = document.getElementById("Comments");
+
+
+        let comobj = [];
+        let displayObj;
+
+        let commentData={
+            comment:'',
+            time:''
+        }
+
+
+        // enter key press event
+        comment.addEventListener("keyup", (e) => {
+            if (e.keyCode === 13) {
+                // push object into array 
+
+                commentData.comment = comment.value;
+                commentData.time = new Date().toLocaleString();
+                comobj.push(commentData);
+
+                //convert array into json and add to local storage
+                localStorage.setItem("comments", JSON.stringify(comobj));
+
+                // refresh the page -- normal html only
+
+                location.reload();
+               
+            }
+        })
+
+        //get values from local storage
+        if(localStorage.getItem('comments')!=null){
+            comobj = JSON.parse(localStorage.getItem('comments'));
+        }
+        displayObj = JSON.parse(localStorage.getItem('comments'));
+       
+        for (let comment of displayObj) {
+            Comments.innerHTML += `<br><br>${comment.comment} <br> <span id="time"> ${comment.time}</span`;
+        }
+
+
+        // sticker comment 
+
+        let path = "./media/"
+
+        let stickerData={
+            item:'',
+            time:''
+        }
+        let stickerObj=[];
+        let sticker;
+        const stickerHolder = document.getElementById("sticker");
+
+        const post =(item)=>{
+            stickerData.item=`${path}${item}.png`;
+            stickerData.time=new Date().toLocaleString();
+            console.log(stickerData)
+            stickerObj.push(stickerData);
+            localStorage.setItem("stickers", JSON.stringify(stickerObj));
+            location.reload();
+        }
+
+        if(localStorage.getItem('stickers')!=null){
+            stickerObj = JSON.parse(localStorage.getItem('stickers'));
+        }
+        sticker = JSON.parse(localStorage.getItem('stickers'));
+
+        for (let stk of sticker) {
+            stickerHolder.innerHTML += `<br><br><img src="${stk.item}"> <br> <span id="time"> ${stk.time}</span`;
+        }
+
+
+    </script>
+</body>
+
+</html>
